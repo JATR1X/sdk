@@ -1,0 +1,33 @@
+<?php
+
+namespace Tygh\Models;
+
+use Tygh\Models\Components\AModel;
+
+class %entity_name_cml% extends AModel
+{
+    public function getTableName()
+    {
+        return '?:%entity_name_und%s';
+    }
+
+    public function getPrimaryField()
+    {
+        return '%entity_name_und%_id';
+    }
+
+    public function getDescriptionTableName()
+    {
+        return '?:%entity_name_und%_descriptions';
+    }
+
+    public function getFields($params)
+    {
+        $fields = array(
+            '?:%entity_name_und%s.*',
+            '?:%entity_name_und%_descriptions.*',
+        );
+
+        return $fields;
+    }
+}
