@@ -7,10 +7,13 @@ class Addon
 
     protected $root_directory_path;
 
-    public function __construct($id, $root_directory_path)
+    protected $theme_name;
+
+    public function __construct($id, $root_directory_path, $theme_name = '')
     {
         $this->id = $id;
         $this->root_directory_path = $root_directory_path;
+        $this->theme_name = $theme_name;
     }
 
     /**
@@ -24,9 +27,62 @@ class Addon
     /**
      * @return mixed
      */
+    public function getThemeName()
+    {
+        return !empty($this->theme_name) ? $this->theme_name : 'responsive';
+    }
+
+    /**
+     * @return mixed
+     */
     public function getRootDirectoryPath()
     {
         return $this->root_directory_path;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAppPath()
+    {
+        return "{$this->getRootDirectoryPath()}/app/addons/{$this->id}/";
+    }
+
+    /**
+     * @param string $view_subpath
+     * @param string $area
+     * @return mixed
+     */
+    public function getViewPath($view_subpath, $area = 'A')
+    {
+        $view_subpath = !empty($view_subpath) ? $view_subpath . '.php' : '';
+        $area = !empty($area) && $area == 'C' ? "/themes/{$this->getThemeName()}/" : '/backend/addons/';
+
+        return "{$this->getRootDirectoryPath()}/{$area}/addons/{$this->id}/{$view_subpath}";
+    }
+
+    /**
+     * @param $model_name
+     * @return mixed
+     */
+    public function getModelPath($model_name = '')
+    {
+        $model_name = !empty($model_name) ? $model_name . '.php' : '';
+
+        return "{$this->getAppPath()}/Models/Tygh/{$model_name}";
+    }
+
+    /**
+     * @param string $controller_name
+     * @param string $area
+     * @return mixed
+     */
+    public function getControllerPath($controller_name = '', $area = 'A')
+    {
+        $controller_name = !empty($controller_name) ? $controller_name . '.php' : '';
+        $area = !empty($area) && $area == 'C' ? 'frontend' : 'backend';
+
+        return "{$this->getAppPath()}/controllers/{$area}/{$controller_name}";
     }
 
     public function getFilesGlobMasks()

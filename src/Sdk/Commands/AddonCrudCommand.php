@@ -22,7 +22,8 @@ class AddonCrudCommand extends Command
     protected $input;
     protected $output;
 
-    protected $config = array();
+    protected $args = array();
+    protected $options = array();
 
     public function __set($name, $value)
     {
@@ -100,21 +101,34 @@ class AddonCrudCommand extends Command
         $this->input = & $input;
         $this->output = & $output;
 
-        $this->saveConfig($input);
+        $saved = $this->saveConfig($input);
+        if ($saved) {
+            $addon = new Addon($this->args['addon_name'], $this->args['cart_directory']);
 
-        $addon_app_path = $this->getAddonPath($this->cart_directory, $this->addon_name, '/app/');
-        $addon_bck_path = $this->getAddonPath($this->cart_directory, $this->addon_name, '/backend/templates/');
-
-        $this->createModel($addon_app_path);
+            $this->createPart($addon, 'model');
+            $this->createPart($addon, 'controller');
+            $this->createPart($addon, 'view');
+        }
     }
 
     protected function saveConfig(InputInterface $input)
     {
-        $this->cart_directory = $this->getCartPath();
-        $this->addon_name = $input->getArgument('name');
-        $this->entity_name = $input->getArgument('entity-name');
-        $this->db_entity = $input->getOption('db-entity');
-        $this->db_descr = $input->getOption('db-descr');
+        $this->args['cart_directory'] = $this->getCartPath();
+        $this->args['addon_name'] = $input->getArgument('name');
+        $this->args['entity_name'] = $input->getArgument('entity-name');
+
+        $this->options['db_entity'] = $input->getOption('db-entity');
+        $this->options['db_descr'] = $input->getOption('db-descr');
+
+        $result = true;
+        foreach ($this->args as $arg) {
+            if (empty($arg)) {
+                $result = false;
+                break;
+            }
+        }
+
+        return $result;
     }
 
     protected function getCartPath()
@@ -132,75 +146,68 @@ class AddonCrudCommand extends Command
         return $dir;
     }
 
-    protected function getAddonPath($cart_path, $addon_name, $inter = '', $create = true)
+    protected function createPart(Addon $addon, $type)
     {
-        $path = '';
-
-        if (!empty($cart_path) && !empty($addon_name)) {
-            $fs = new Filesystem();
-
-            $hypo_dir = $cart_path . $inter . '/addons/' . $addon_name;
-
-            if (!$fs->exists($hypo_dir)) {
-                if ($create === true) {
-                    $fs->mkdir($hypo_dir);
-                    $path = $hypo_dir;
-                }
-
-            } else {
-                $path = $hypo_dir;
-            }
+        if (empty($addon)) {
+            return $addon;
         }
 
-        return $path;
-    }
+        $paths = '';
 
-    protected function createModel($path, $namespace_dirs = true)
-    {
-        $fs = new Filesystem();
-        $models_dir = $path;
+        if ($type == 'model') {
+            $paths = array(
+                'ModelClass.php' => $addon->getModelPath($this->args['entity_name'])
+            );
 
-        if (!empty($models_dir) && $namespace_dirs === true) {
-            $models_dir = $path . '/Tygh/Models/';
-            if (!$fs->exists($models_dir)) {
-                $fs->mkdir($models_dir);
-            }
+        } else if ($type == 'controller') {
+            $paths = array(
+                'Controller.php' => $addon->getControllerPath($this->args['addon_name'])
+            );
+
+        } else if ($type == 'view') {
+            $paths = array(
+                'EntityList.tpl' => $addon->getViewPath("/components/list.tpl"),
+                'SearchForm.tpl' => $addon->getViewPath("/components/search_form.tpl"),
+                'UpdateView.tpl' => $addon->getViewPath("/views/{$this->args['addon_name']}/update.tpl"),
+                'ManageView.tpl' => $addon->getViewPath("/views/{$this->args['addon_name']}/manage.tpl")
+            );
         }
 
-        if (!empty($models_dir)) {
-            $fp = fopen($models_dir . $this->entity_name . '.php', 'w');
-            $get_model_code = $this->getModelClass();
-            fwrite($fp, $get_model_code);
-            fclose($fp);
-        }
-    }
+        if (!empty($paths)) {
+            foreach ($paths as $sample => $path) {
+                $fp = static::smartFileOpen($path);
 
-    protected function getModelClass()
-    {
-        $input = $this->getInput();
-        $entity_name = $this->entity_name;
-
-        $code = '';
-
-        if ($input && $entity_name) {
-            $code = stream_get_contents($this->getCodeComponent('ModelClass.php'));
-
-            if ($code) {
-                $vars = array(
-                    '%entity_name_cml%' => $entity_name,
-                    '%entity_name_und%' => $this->convertNotation($entity_name, 'camel', 'underscore')
-                );
-
-                foreach ($vars as $var => $value) {
-                    $code = str_replace($var, $value, $code);
+                if (!empty($fp)) {
+                    $sample = $this->getSample($sample);
+                    fwrite($fp, $sample);
+                    fclose($fp);
                 }
             }
         }
 
-        return $code;
+        return true;
     }
 
-    protected function getCodeComponent($name)
+    protected function getSample($name)
+    {
+        $code = stream_get_contents($this->getCrudComponent($name));
+
+        if (!empty($code)) {
+            $vars = array(
+                '%entity_name_cml%' => $this->args['entity_name'],
+                '%entity_name_und%' => $this->convertNotation($this->args['entity_name'], 'camel', 'underscore'),
+                '%addon_name%' => $this->args['addon_name']
+            );
+
+            foreach ($vars as $var => $value) {
+                $code = str_replace($var, $value, $code);
+            }
+        }
+
+        return !empty($code) ? $code : '';
+    }
+
+    protected function getCrudComponent($name)
     {
         $fs = new Filesystem();
 
@@ -223,5 +230,14 @@ class AddonCrudCommand extends Command
         }
 
         return $component;
+    }
+
+    public static function smartFileOpen($path)
+    {
+        if(!file_exists(dirname($path))) {
+            mkdir(dirname($path), 0777, true);
+        }
+
+        return fopen($path, 'w');
     }
 }

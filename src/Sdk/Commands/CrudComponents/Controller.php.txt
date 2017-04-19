@@ -1,0 +1,77 @@
+<?php
+
+use Tygh\Registry;
+use Tygh\Models\%entity_name_cml%;
+
+if (!defined('BOOTSTRAP')) { die('Access denied'); }
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    fn_trusted_vars (
+        '%entity_name_und%_data'
+    );
+
+    $suffix = 'manage';
+
+    if ($mode == 'update' || $mode == 'add') {
+        if (!empty($_REQUEST['%entity_name_und%_id']) && $mode == 'update') {
+            $%entity_name_und% = %entity_name_cml%::model()->find($_REQUEST['%entity_name_und%_id']);
+        } else if ($mode == 'add') {
+            $%entity_name_und% = new %entity_name_cml%();
+        }
+
+        if (!empty($%entity_name_und%)) {
+            $%entity_name_und%->attributes($_REQUEST['%entity_name_und%_data']);
+            $result = $%entity_name_und%->save();
+
+            if (!empty($result)) {
+                $suffix = 'update?%entity_name_und%_id=' . $%entity_name_und%->%entity_name_und%_id;
+            }
+        }
+
+    } else if ($mode == 'delete') {
+        $%entity_name_und% = %entity_name_cml%::model()->find($_REQUEST['%entity_name_und%_id']);
+
+        if (!empty($%entity_name_und%)) {
+            $%entity_name_und%->delete();
+        }
+
+    } else if ($mode == 'm_delete') {
+        if (!empty($_REQUEST['%entity_name_und%_ids'])) {
+            foreach ($_REQUEST['%entity_name_und%_ids'] as $page_id) {
+                $%entity_name_und% = %entity_name_cml%::model()->find($page_id);
+                if (!empty($%entity_name_und%)) {
+                    $%entity_name_und%->delete();
+                }
+            }
+        }
+    }
+
+    return array(CONTROLLER_STATUS_OK, '%id%.' . $suffix);
+}
+
+if ($mode == 'manage') {
+    $params = array_merge(
+        array('items_per_page' => Registry::get('settings.Appearance.admin_elements_per_page')),
+        $_REQUEST,
+        array(
+            'return_params' => true,
+            'get_companies_count' => true,
+            'lang_code' => DESCR_SL,
+        )
+    );
+
+    list($%entity_name_und%s, $search) = %entity_name_cml%::model()->findMany($params);
+
+    Tygh::$app['view']->assign('%entity_name_und%s', $%entity_name_und%s);
+    Tygh::$app['view']->assign('search', $search);
+    
+} else if ($mode == 'add' || $mode == 'update') {
+    if ($mode == 'update' && !empty($_REQUEST['%entity_name_und%_id'])) {
+        $%entity_name_und% = %entity_name_cml%::model()->find($_REQUEST['%entity_name_und%_id']);
+       
+    } else if ($mode == 'add') {
+        $%entity_name_und% = new %entity_name_cml%();
+    }
+
+    Tygh::$app['view']->assign('%entity_name_und%', $%entity_name_und%);
+}

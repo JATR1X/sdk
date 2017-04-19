@@ -1,0 +1,36 @@
+{capture name="mainbox"}
+    <form action="{""|fn_url}" method="post" name="%entity_name_und%_form" id="%entity_name_und%_form">
+        <input type="hidden" name="redirect_url" value="{$config.current_url}" />
+
+        {if $search.type}
+            <input type="hidden" name="type" value="{$search.type}" />
+        {/if}
+
+        {include file="common/pagination.tpl" save_current_page=true save_current_url=true div_id=$smarty.request.content_id hide_position=$hide_position}
+
+        <div class="items-container">
+            {include file="addons/%addon_name%/components/list.tpl"}
+        </div>
+
+        {include file="common/pagination.tpl" div_id=$smarty.request.content_id}
+
+        {assign var="rev" value=$smarty.request.content_id|default:"pagination_contents"}
+
+        {capture name="buttons"}
+            {capture name="tools_list"}
+                <li>{btn type="delete_selected" dispatch="dispatch[%entity_name_und%.m_delete]" form="%entity_name_und%_form"}</li>
+            {/capture}
+            {dropdown content=$smarty.capture.tools_list}
+            {include file="common/tools.tpl" tool_href="%entity_name_und%.add" title=__("add_landing_page") hide_tools=true icon="icon-plus"}
+        {/capture}
+    </form>
+{/capture}
+
+{capture name="sidebar"}
+    {$view_type = "pages"}
+    {$view_suffix = ""}
+
+    {include file="addons/%addon_name%/components/search_form.tpl" dispatch="%entity_name_und%.manage" view_type=$view_type}
+{/capture}
+
+{include file="common/mainbox.tpl" title=__("%entity_name_und%") content=$smarty.capture.mainbox  buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons sidebar=$smarty.capture.sidebar content_id="manage_landing_   pages"}

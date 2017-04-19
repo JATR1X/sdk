@@ -1,0 +1,97 @@
+{if $%entity_name_und%->%entity_name_und%_id}
+    {assign var="id" value=$%entity_name_und%->%entity_name_und%_id}
+    {assign var="_title" value=$%entity_name_und%->name}
+{else}
+    {assign var="id" value=0}
+    {assign var="_title" value=__("new_%entity_name_und%")}
+{/if}
+
+{capture name="mainbox"}
+    <form action="{""|fn_url}" method="post" name="update_%entity_name_und%_form_{$id}" class="form-horizontal form-edit ">
+        <div id="update_%entity_name_und%_form_{$id}">
+            <input type="hidden" name="%entity_name_und%_id" value="{$id}" />
+            <input type="hidden" name="dispatch[%entity_name_und%s.{if $id}update{else}add{/if}]" value="1" />
+
+            {capture name="tabsbox"}
+                {include file="common/subheader.tpl" title=__("information") target="#acc_info"}
+                <div id="acc_info" class="collapsed in">
+                    <div class="control-group">
+                        <label class="control-label cm-required" for="elm_%entity_name_und%_name">{__("name")}:</label>
+                        <div class="controls">
+                            <input type="text" id="elm_%entity_name_und%_name" name="%entity_name_und%_data[name]" size="35" value="{$%entity_name_und%.name}" class="input-large" />
+                        </div>
+                    </div>
+                    {include file="common/select_status.tpl" input_name="%entity_name_und%_data[status]" id="%entity_name_und%_data_`$id`" obj=$%entity_name_und%}
+                </div>
+
+                {include file="common/subheader.tpl" title=__("visible_page_data") target="#acc_visible_page_data"}
+                <div id="acc_visible_page_data" class="collapsed in">
+                    <div class="control-group">
+                        <label class="control-label" for="elm_%entity_name_und%_mainbox_title">{__("mainbox_title")}:</label>
+                        <div class="controls">
+                            <input type="text" id="elm_%entity_name_und%_mainbox_title" name="%entity_name_und%_data[mainbox_title]" size="35" value="{$%entity_name_und%.mainbox_title}" class="input-large" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="elm_%entity_name_und%_description">{__("description")}:</label>
+                        <div class="controls">
+                            <textarea id="elm_%entity_name_und%_description" name="%entity_name_und%_data[description]" cols="55" rows="8" class="input-large cm-wysiwyg input-textarea-long">{$%entity_name_und%.description}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                {include file="common/subheader.tpl" title=__("seo_meta_data") target="#acc_seo"}
+                <div id="acc_seo" class="collapsed in">
+                    <div class="control-group">
+                        <label class="control-label" for="elm_%entity_name_und%_page_title">{__("page_title")}:</label>
+                        <div class="controls">
+                            <input type="text" name="%entity_name_und%_data[page_title]" id="elm_%entity_name_und%_page_title" size="55" value="{$%entity_name_und%.page_title}" class="input-large" />
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="elm_%entity_name_und%_meta_description">{__("meta_description")}:</label>
+                        <div class="controls">
+                            <textarea name="%entity_name_und%_data[meta_description]" id="elm_%entity_name_und%_meta_description" cols="55" rows="4" class="input-large">{$%entity_name_und%.meta_description}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="elm_%entity_name_und%_meta_keywords">{__("meta_keywords")}:</label>
+                        <div class="controls">
+                            <textarea name="%entity_name_und%_data[meta_keywords]" id="elm_%entity_name_und%_meta_keywords" cols="55" rows="4" class="input-large">{$%entity_name_und%.meta_keywords}</textarea>
+                        </div>
+                    </div>
+                </div>
+            {/capture}
+            {include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox}
+        <!--update_%entity_name_und%_form_{$id}-->
+
+        {capture name="buttons"}
+            {assign var="allow_save" value=true}
+            {assign var="show_save_btn" value=true}
+
+            {capture name="tools_list"}
+                {if $id}
+                    {if $preview_url}
+                        <li>{btn type="list" target="_blank" text=__("preview") href=$preview_url}</li>
+                        <li class="divider"></li>
+                    {/if}
+
+                    {if $allow_save}
+                        <li>{btn type="list" text=__("delete_this_page") class="cm-confirm" href="%entity_name_und%s.delete?%entity_name_und%_id=$id" method="POST"}</li>
+                    {/if}
+                {/if}
+            {/capture}
+            {dropdown content=$smarty.capture.tools_list}
+
+            {if !$show_save_btn}
+                {assign var="hide_first_button" value=true}
+                {assign var="hide_second_button" value=true}
+            {/if}
+            {include file="buttons/save_cancel.tpl" but_name="dispatch[%entity_name_und%s.update]" hide_first_button=$hide_first_button hide_second_button=$hide_second_button but_target_form="update_%entity_name_und%_form_{$id}" save=$id}
+        {/capture}
+    </form>
+{/capture}
+
+{include file="common/mainbox.tpl" title=$_title sidebar=$smarty.capture.sidebar sidebar_position="left" content=$smarty.capture.mainbox buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons}
