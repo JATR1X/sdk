@@ -4,28 +4,28 @@ namespace Tygh\Models;
 
 use Tygh\Models\Components\AModel;
 
-class %entity_name_cml% extends AModel
+class %EntityName% extends AModel
 {
     public function getTableName()
     {
-        return '?:%entity_name_und%s';
+        return '?:%entity_name%s';
     }
 
     public function getPrimaryField()
     {
-        return '%entity_name_und%_id';
+        return '%entity_name%_id';
     }
 
     public function getDescriptionTableName()
     {
-        return '?:%entity_name_und%_descriptions';
+        return '?:%entity_name%_descriptions';
     }
 
     public function getFields($params)
     {
         $fields = array(
-            '?:%entity_name_und%s.*',
-            '?:%entity_name_und%_descriptions.*',
+            '?:%entity_name%s.*',
+            '?:%entity_name%_descriptions.*',
         );
 
         return $fields;

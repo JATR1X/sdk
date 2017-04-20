@@ -55,8 +55,8 @@ class Addon
      */
     public function getViewPath($view_subpath, $area = 'A')
     {
-        $view_subpath = !empty($view_subpath) ? $view_subpath . '.php' : '';
-        $area = !empty($area) && $area == 'C' ? "/themes/{$this->getThemeName()}/" : '/backend/addons/';
+        $view_subpath = !empty($view_subpath) ? $view_subpath : '';
+        $area = !empty($area) && $area == 'C' ? "/themes/{$this->getThemeName()}/templates/" : '/backend/templates/';
 
         return "{$this->getRootDirectoryPath()}/{$area}/addons/{$this->id}/{$view_subpath}";
     }
@@ -70,6 +70,13 @@ class Addon
         $model_name = !empty($model_name) ? $model_name . '.php' : '';
 
         return "{$this->getAppPath()}/Models/Tygh/{$model_name}";
+    }
+
+    public function getLangVarsPath($lang)
+    {
+        $path = "{$this->getRootDirectoryPath()}/var/langs/{$lang}/addons/{$this->id}.po";
+
+        return $path;
     }
 
     /**

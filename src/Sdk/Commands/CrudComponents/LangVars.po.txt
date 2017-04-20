@@ -1,0 +1,21 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US"
+
+msgctxt "Addons::name::%addon_name%"
+msgid "%AddonName%"
+msgstr "%AddonName%"
+
+msgctxt "Addons::description::%addon_name%"
+msgid "%AddonName%Description"
+msgstr "%AddonName%Description"
+
+msgctxt "Languages::%addon_name%"
+msgid "%AddonName%"
+msgstr "%AddonName%"
+
+msgctxt "Languages::%addon_name%s"
+msgid "%AddonName%s"
+msgstr "%AddonName%s"

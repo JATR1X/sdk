@@ -82,13 +82,13 @@ class AddonCrudCommand extends Command
             ->addArgument('entity-name',
                 InputArgument::REQUIRED,
                 'CRUD entity name'
-            )->addOption('db-entity',
-                'db_entity',
-                InputOption::VALUE_NONE,
+            )->addOption('db-table-main',
+                'dbt-main',
+                InputOption::VALUE_REQUIRED,
                 'Create entity database table'
-            )->addOption('db-descr',
-                'db_descr',
-                InputOption::VALUE_NONE,
+            )->addOption('db-table-description',
+                'dbt-descr',
+                InputOption::VALUE_REQUIRED,
                 'Create description database table'
             );
     }
@@ -108,6 +108,8 @@ class AddonCrudCommand extends Command
             $this->createPart($addon, 'model');
             $this->createPart($addon, 'controller');
             $this->createPart($addon, 'view');
+            $this->createPart($addon, 'manifest');
+            $this->createPart($addon, 'lang_vars');
         }
     }
 
@@ -117,8 +119,7 @@ class AddonCrudCommand extends Command
         $this->args['addon_name'] = $input->getArgument('name');
         $this->args['entity_name'] = $input->getArgument('entity-name');
 
-        $this->options['db_entity'] = $input->getOption('db-entity');
-        $this->options['db_descr'] = $input->getOption('db-descr');
+        $this->options['db_tables'] = $this->getDatabaseTables($input, $this->args['entity_name']);
 
         $result = true;
         foreach ($this->args as $arg) {
@@ -129,6 +130,27 @@ class AddonCrudCommand extends Command
         }
 
         return $result;
+    }
+
+    protected function getDatabaseTables(InputInterface $input, $entity_name)
+    {
+        $tables = array(
+            $entity_name . 's' => $input->getOption('db-table-main'),
+            $entity_name . '_descriptions' => $input->getOption('db-table-description')
+        );
+
+        $tables = array_filter($tables);
+
+        foreach ($tables as &$table) {
+            $table = explode(',', $table);
+
+            if (!in_array($entity_name . '_id', $tables)) {
+                $table = array($entity_name . '_id') + $table;
+            }
+
+        } unset($table);
+
+        return $tables;
     }
 
     protected function getCartPath()
@@ -156,7 +178,16 @@ class AddonCrudCommand extends Command
 
         if ($type == 'model') {
             $paths = array(
-                'ModelClass.php' => $addon->getModelPath($this->args['entity_name'])
+                'Model.php' => $addon->getModelPath($this->args['entity_name'])
+            );
+        } else if ($type == 'lang_vars') {
+            $paths = array(
+                'LangVars.po' => $addon->getLangVarsPath('en')
+            );
+
+        } else if ($type == 'manifest') {
+            $paths = array(
+                'Manifest.xml' => $addon->getAppPath() . 'addon.xml'
             );
 
         } else if ($type == 'controller') {
@@ -194,9 +225,11 @@ class AddonCrudCommand extends Command
 
         if (!empty($code)) {
             $vars = array(
-                '%entity_name_cml%' => $this->args['entity_name'],
-                '%entity_name_und%' => $this->convertNotation($this->args['entity_name'], 'camel', 'underscore'),
-                '%addon_name%' => $this->args['addon_name']
+                '%EntityName%' => $this->convertNotation($this->args['entity_name'], 'underscore', 'camel'),
+                '%entity_name%' => $this->args['entity_name'],
+                '%AddonName%' => $this->convertNotation($this->args['addon_name'], 'underscore', 'camel'),
+                '%addon_name%' => $this->args['addon_name'],
+                '%db_tables_xml%' => $this->getDbQueriesXml($this->options['db_tables'])
             );
 
             foreach ($vars as $var => $value) {
@@ -205,6 +238,41 @@ class AddonCrudCommand extends Command
         }
 
         return !empty($code) ? $code : '';
+    }
+
+    protected function getDbQueriesXml($tables)
+    {
+        $result = '';
+        if (empty($tables)) {
+            return $result;
+        }
+
+        $append = function($string, $tab_level = 1) use (&$result) {
+            $tabs = "";
+            for ($i = 0; $i < $tab_level; $i++) {
+                $tabs .= "\t";
+            }
+
+            $result .= $tabs . $string . "\r\n";
+        };
+
+        $append("<queries>", 1);
+        foreach ($tables as $table_name => $columns) {
+            $append("<item for=\"install\">", 2);
+            $append("CREATE TABLE `?:{$table_name}` (", 3);
+
+            foreach ($columns as $column) {
+                $append("`{$column}` <type_placeholder>,", 4);
+            }
+
+            $append("PRIMARY KEY (`{$this->args['entity_name']}_id`)", 4);
+            $append(") ENGINE=MyISAM DEFAULT CHARSET=utf8;", 3);
+            $append("</item>", 2);
+        }
+
+        $append("</queries>", 1);
+
+        return $result;
     }
 
     protected function getCrudComponent($name)

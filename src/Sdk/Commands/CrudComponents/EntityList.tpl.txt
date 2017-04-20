@@ -5,14 +5,14 @@
 {/if}
 
 {if !$checkbox_name}
-    {assign var="checkbox_name" value="%entity_name_und%_ids"}
+    {assign var="checkbox_name" value="%entity_name%_ids"}
 {/if}
 
 {assign var="c_url" value=$config.current_url|fn_query_remove:"sort_by":"sort_order"}
 {assign var="c_icon" value="<i class=\"exicon-`$search.sort_order_rev`\"></i>"}
 {assign var="c_dummy" value="<i class=\"exicon-dummy\"></i>"}
 
-{if $%entity_name_und%s}
+{if $%entity_name%s}
     <table width="100%" class="table table-tree table-middle table-nobg">
         {if !$hide_header}
             <thead>
@@ -43,19 +43,19 @@
         {/if}
 
         <tbody>
-            {foreach from=$%entity_name_und%s item="page"}
-                {assign var="_update_href" value="%entity_name_und%s.update?%entity_name_und%_id=`$page->%entity_name_und%_id`"|fn_url}
-                {assign var="_delete_href" value="%entity_name_und%s.delete?%entity_name_und%_id=`$page->%entity_name_und%_id`"|fn_url}
+            {foreach from=$%entity_name%s item="page"}
+                {assign var="_update_href" value="%entity_name%s.update?%entity_name%_id=`$page->%entity_name%_id`"|fn_url}
+                {assign var="_delete_href" value="%entity_name%s.delete?%entity_name%_id=`$page->%entity_name%_id`"|fn_url}
 
                 <tr class="cm-row-status-{$page->status|lower}" {if $page->level > 0 && $search.get_tree == "multi_level"}class="multiple-table-row"{/if}>
                     <td class="left" width="3%">
-                        <input type="checkbox" name="{$checkbox_name}[]" id="checkbox_{$page->%entity_name_und%_id}" value="{$page->%entity_name_und%_id}" class="cm-item" />
+                        <input type="checkbox" name="{$checkbox_name}[]" id="checkbox_{$page->%entity_name%_id}" value="{$page->%entity_name%_id}" class="cm-item" />
                     </td>
                     <td class="row-status" width="5%">
                         {strip}
                             <div class="text-over">
-                                <a href="{$_update_href}" {if $page->status == "N"}class="manage-root-item-disabled"{/if} id="page_title_{$page->%entity_name_und%_id}" title="{$page->%entity_name_und%_id}">
-                                    {$page->%entity_name_und%_id}
+                                <a href="{$_update_href}" {if $page->status == "N"}class="manage-root-item-disabled"{/if} id="page_title_{$page->%entity_name%_id}" title="{$page->%entity_name%_id}">
+                                    {$page->%entity_name%_id}
                                 </a>
                             </div>
                         {/strip}
@@ -63,7 +63,7 @@
                     <td class="row-status" width="40%">
                         {strip}
                             <div class="text-over">
-                                <a href="{$_update_href}" {if $page->status == "N"}class="manage-root-item-disabled"{/if} id="page_title_{$page->%entity_name_und%_id}" title="{$page->name}">
+                                <a href="{$_update_href}" {if $page->status == "N"}class="manage-root-item-disabled"{/if} id="page_title_{$page->%entity_name%_id}" title="{$page->name}">
                                     {$page->name}
                                 </a>
                             </div>
@@ -84,7 +84,7 @@
                         </div>
                     </td>
                     <td width="10%" class="nowrap right">
-                        {include file="common/select_popup.tpl" id=$page->%entity_name_und%_id status=$page->status object_id_name="%entity_name_und%_id" table="%entity_name_und%s" popup_additional_class="dropleft"}
+                        {include file="common/select_popup.tpl" id=$page->%entity_name%_id status=$page->status object_id_name="%entity_name%_id" table="%entity_name%s" popup_additional_class="dropleft"}
                     </td>
                 </tr>
             {/foreach}

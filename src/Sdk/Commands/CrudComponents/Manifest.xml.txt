@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>%addon_name%</id>
+    <status>active</status>
+    <version>1.0</version>
+    <priority>100500</priority>
+    <position>0</position>
+%db_tables_xml%
+</addon>
