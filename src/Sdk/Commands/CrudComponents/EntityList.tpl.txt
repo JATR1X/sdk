@@ -23,27 +23,13 @@
                         {__("id")}{if $search.sort_by == "id"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}
                     </a>
                 </th>
-                <th width="40%" class="left">
-                    <a class="cm-ajax" href="{"`$c_url`&sort_by=name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">
-                        {__("name")}{if $search.sort_by == "name"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}
-                    </a>
-                </th>
-                <th width="25%" class="left">
-                    {* sorting not possible because filling type information is serialized *}
-                    {__("filling_type")}
-                </th>
-                {if !$hide_delete_button}<th width="10%">&nbsp;</th>{/if}
-                <th width="10%" class="right">
-                    <a class="cm-ajax" href="{"`$c_url`&sort_by=status&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">
-                        {__("status")}{if $search.sort_by == "status"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}
-                    </a>
-                </th>
+                %generator_tpl_field_list_head%
             </tr>
             </thead>
         {/if}
 
         <tbody>
-            {foreach from=$%entity_name%s item="page"}
+            {foreach from=$%entity_name%s item="%entity_name%"}
                 {assign var="_update_href" value="%entity_name%s.update?%entity_name%_id=`$page->%entity_name%_id`"|fn_url}
                 {assign var="_delete_href" value="%entity_name%s.delete?%entity_name%_id=`$page->%entity_name%_id`"|fn_url}
 
@@ -60,18 +46,7 @@
                             </div>
                         {/strip}
                     </td>
-                    <td class="row-status" width="40%">
-                        {strip}
-                            <div class="text-over">
-                                <a href="{$_update_href}" {if $page->status == "N"}class="manage-root-item-disabled"{/if} id="page_title_{$page->%entity_name%_id}" title="{$page->name}">
-                                    {$page->name}
-                                </a>
-                            </div>
-                        {/strip}
-                    </td>
-                    <td class="row-status" width="25%">
-                        {__("{$page->content.filling}")}
-                    </td>
+                    %generator_tpl_field_list_body%
                     <td width="10%">
                         {capture name="tools_list"}
                             <li>{btn type="list" text=__("edit") href=$_update_href}</li>
@@ -82,9 +57,6 @@
                         <div class="hidden-tools">
                             {dropdown content=$smarty.capture.tools_list}
                         </div>
-                    </td>
-                    <td width="10%" class="nowrap right">
-                        {include file="common/select_popup.tpl" id=$page->%entity_name%_id status=$page->status object_id_name="%entity_name%_id" table="%entity_name%s" popup_additional_class="dropleft"}
                     </td>
                 </tr>
             {/foreach}

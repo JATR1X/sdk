@@ -58,7 +58,7 @@ class Addon
         $view_subpath = !empty($view_subpath) ? $view_subpath : '';
         $area = !empty($area) && $area == 'C' ? "/themes/{$this->getThemeName()}/templates/" : '/backend/templates/';
 
-        return "{$this->getRootDirectoryPath()}/{$area}/addons/{$this->id}/{$view_subpath}";
+        return "{$this->getRootDirectoryPath()}/design/{$area}/addons/{$this->id}/{$view_subpath}";
     }
 
     /**

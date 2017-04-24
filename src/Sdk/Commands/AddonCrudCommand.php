@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Filesystem\Filesystem;
+use Tygh\Sdk\Commands\Traits\CodeGenerator;
 use Tygh\Sdk\Commands\Traits\NotationTrait;
 use Tygh\Sdk\Commands\Traits\ValidateCartPathTrait;
 use Tygh\Sdk\Entities\Addon;
@@ -18,6 +19,7 @@ class AddonCrudCommand extends Command
 {
     use ValidateCartPathTrait;
     use NotationTrait;
+    use CodeGenerator;
 
     protected $input;
     protected $output;
@@ -145,7 +147,9 @@ class AddonCrudCommand extends Command
             $table = explode(',', $table);
 
             if (!in_array($entity_name . '_id', $tables)) {
-                $table = array($entity_name . '_id') + $table;
+                $table = array_merge(array(
+                    $entity_name . '_id'
+                ), $table);
             }
 
         } unset($table);
@@ -221,16 +225,26 @@ class AddonCrudCommand extends Command
 
     protected function getSample($name)
     {
+        // TODO: Direct smarty execution.
+        // It would make var replacements unnecessary by passing variables directly.
+        // CodeGenerator trait would also be redundant.
         $code = stream_get_contents($this->getCrudComponent($name));
 
         if (!empty($code)) {
-            $vars = array(
-                '%EntityName%' => $this->convertNotation($this->args['entity_name'], 'underscore', 'camel'),
-                '%entity_name%' => $this->args['entity_name'],
-                '%AddonName%' => $this->convertNotation($this->args['addon_name'], 'underscore', 'camel'),
-                '%addon_name%' => $this->args['addon_name'],
-                '%db_tables_xml%' => $this->getDbQueriesXml($this->options['db_tables'])
-            );
+            static $vars = array();
+            if (empty($vars)) {
+                $vars = array(
+                    // NOTE: CodeGenerator vars should always be first in this array.
+                    '%generator_xml_queries%' => $this->generateCode('xml_queries', array($this->options['db_tables'])),
+                    '%generator_tpl_field_list_head%' => $this->generateCode('tpl_field_list', array($this->options['db_tables'], 'head')),
+                    '%generator_tpl_field_list_body%' => $this->generateCode('tpl_field_list', array($this->options['db_tables'], 'body')),
+
+                    '%EntityName%' => $this->convertNotation($this->args['entity_name'], 'underscore', 'camel'),
+                    '%entity_name%' => $this->args['entity_name'],
+                    '%AddonName%' => $this->convertNotation($this->args['addon_name'], 'underscore', 'camel'),
+                    '%addon_name%' => $this->args['addon_name'],
+                );
+            }
 
             foreach ($vars as $var => $value) {
                 $code = str_replace($var, $value, $code);
@@ -238,41 +252,6 @@ class AddonCrudCommand extends Command
         }
 
         return !empty($code) ? $code : '';
-    }
-
-    protected function getDbQueriesXml($tables)
-    {
-        $result = '';
-        if (empty($tables)) {
-            return $result;
-        }
-
-        $append = function($string, $tab_level = 1) use (&$result) {
-            $tabs = "";
-            for ($i = 0; $i < $tab_level; $i++) {
-                $tabs .= "\t";
-            }
-
-            $result .= $tabs . $string . "\r\n";
-        };
-
-        $append("<queries>", 1);
-        foreach ($tables as $table_name => $columns) {
-            $append("<item for=\"install\">", 2);
-            $append("CREATE TABLE `?:{$table_name}` (", 3);
-
-            foreach ($columns as $column) {
-                $append("`{$column}` <type_placeholder>,", 4);
-            }
-
-            $append("PRIMARY KEY (`{$this->args['entity_name']}_id`)", 4);
-            $append(") ENGINE=MyISAM DEFAULT CHARSET=utf8;", 3);
-            $append("</item>", 2);
-        }
-
-        $append("</queries>", 1);
-
-        return $result;
     }
 
     protected function getCrudComponent($name)
