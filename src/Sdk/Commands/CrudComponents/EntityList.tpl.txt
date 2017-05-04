@@ -30,18 +30,18 @@
 
         <tbody>
             {foreach from=$%entity_name%s item="%entity_name%"}
-                {assign var="_update_href" value="%entity_name%s.update?%entity_name%_id=`$page->%entity_name%_id`"|fn_url}
-                {assign var="_delete_href" value="%entity_name%s.delete?%entity_name%_id=`$page->%entity_name%_id`"|fn_url}
+                {assign var="_update_href" value="%entity_name%s.update?%entity_name%_id=`$%entity_name%->%entity_name%_id`"|fn_url}
+                {assign var="_delete_href" value="%entity_name%s.delete?%entity_name%_id=`$%entity_name%->%entity_name%_id`"|fn_url}
 
-                <tr class="cm-row-status-{$page->status|lower}" {if $page->level > 0 && $search.get_tree == "multi_level"}class="multiple-table-row"{/if}>
+                <tr class="cm-row-status-{$%entity_name%->status|lower}" {if $%entity_name%->level > 0 && $search.get_tree == "multi_level"}class="multiple-table-row"{/if}>
                     <td class="left" width="3%">
-                        <input type="checkbox" name="{$checkbox_name}[]" id="checkbox_{$page->%entity_name%_id}" value="{$page->%entity_name%_id}" class="cm-item" />
+                        <input type="checkbox" name="{$checkbox_name}[]" id="checkbox_{$%entity_name%->%entity_name%_id}" value="{$%entity_name%->%entity_name%_id}" class="cm-item" />
                     </td>
                     <td class="row-status" width="5%">
                         {strip}
                             <div class="text-over">
-                                <a href="{$_update_href}" {if $page->status == "N"}class="manage-root-item-disabled"{/if} id="page_title_{$page->%entity_name%_id}" title="{$page->%entity_name%_id}">
-                                    {$page->%entity_name%_id}
+                                <a href="{$_update_href}" {if $%entity_name%->status == "N"}class="manage-root-item-disabled"{/if} id="page_title_{$%entity_name%->%entity_name%_id}" title="{$%entity_name%->%entity_name%_id}">
+                                    {$%entity_name%->%entity_name%_id}
                                 </a>
                             </div>
                         {/strip}

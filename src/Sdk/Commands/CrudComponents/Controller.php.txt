@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    return array(CONTROLLER_STATUS_OK, '%id%.' . $suffix);
+    return array(CONTROLLER_STATUS_OK, '%entity_name%s.' . $suffix);
 }
 
 if ($mode == 'manage') {

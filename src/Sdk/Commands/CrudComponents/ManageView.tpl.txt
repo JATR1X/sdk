@@ -30,7 +30,7 @@
     {$view_type = "pages"}
     {$view_suffix = ""}
 
-    {include file="addons/%addon_name%/components/search_form.tpl" dispatch="%entity_name%.manage" view_type=$view_type}
+    {*include file="addons/%addon_name%/components/search_form.tpl" dispatch="%entity_name%.manage" view_type=$view_type*}
 {/capture}
 
 {include file="common/mainbox.tpl" title=__("%entity_name%") content=$smarty.capture.mainbox  buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons sidebar=$smarty.capture.sidebar content_id="manage_landing_   pages"}

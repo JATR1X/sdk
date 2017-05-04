@@ -142,15 +142,19 @@ class AddonCrudCommand extends Command
             $entity_name . '_descriptions' => $input->getOption('db-table-description')
         );
 
-//        $tables = array_filter($tables);
-
-        foreach ($tables as &$table) {
+        foreach ($tables as $table_name => &$table) {
             $table = explode(',', $table);
 
-            if (!in_array($entity_name . '_id', $tables)) {
+            if (!in_array($entity_name . '_id', $table)) {
                 $table = array_merge(array(
                     $entity_name . '_id'
                 ), $table);
+            }
+
+            if ($table_name == $entity_name . '_descriptions' && !in_array('lang_code', $table)) {
+                $table = array_merge($table, array(
+                    'lang_code'
+                ));
             }
 
             $table = array_filter($table);
@@ -243,8 +247,9 @@ class AddonCrudCommand extends Command
                 $vars = array(
                     // NOTE: CodeGenerator vars should always be first in this array.
                     '%generator_xml_queries%' => $this->generateCode('xml_queries', array($this->options['db_tables'])),
-                    '%generator_tpl_field_list_head%' => $this->generateCode('tpl_field_list', array($this->options['db_tables'], 'head')),
-                    '%generator_tpl_field_list_body%' => $this->generateCode('tpl_field_list', array($this->options['db_tables'], 'body')),
+                    '%generator_tpl_field_list_head%' => $this->generateCode('tpl_field_list', array($this->options['db_tables'], 'head', $this->args['entity_name'])),
+                    '%generator_tpl_field_list_body%' => $this->generateCode('tpl_field_list', array($this->options['db_tables'], 'body', $this->args['entity_name'])),
+                    '%generator_tpl_field_updates%' => $this->generateCode('tpl_field_updates', array($this->options['db_tables'], $this->args['entity_name'])),
 
                     '%EntityName%' => $this->convertNotation($this->args['entity_name'], 'underscore', 'camel'),
                     '%entity_name%' => $this->args['entity_name'],

@@ -1,6 +1,6 @@
 {if $%entity_name%->%entity_name%_id}
     {assign var="id" value=$%entity_name%->%entity_name%_id}
-    {assign var="_title" value=$%entity_name%->name}
+    {assign var="_title" value="{__("test_crud")} #{$id}"}
 {else}
     {assign var="id" value=0}
     {assign var="_title" value=__("new_%entity_name%")}
@@ -12,59 +12,10 @@
             <input type="hidden" name="%entity_name%_id" value="{$id}" />
             <input type="hidden" name="dispatch[%entity_name%s.{if $id}update{else}add{/if}]" value="1" />
 
-            {capture name="tabsbox"}
-                {include file="common/subheader.tpl" title=__("information") target="#acc_info"}
-                <div id="acc_info" class="collapsed in">
-                    <div class="control-group">
-                        <label class="control-label cm-required" for="elm_%entity_name%_name">{__("name")}:</label>
-                        <div class="controls">
-                            <input type="text" id="elm_%entity_name%_name" name="%entity_name%_data[name]" size="35" value="{$%entity_name%.name}" class="input-large" />
-                        </div>
-                    </div>
-                    {include file="common/select_status.tpl" input_name="%entity_name%_data[status]" id="%entity_name%_data_`$id`" obj=$%entity_name%}
-                </div>
-
-                {include file="common/subheader.tpl" title=__("visible_page_data") target="#acc_visible_page_data"}
-                <div id="acc_visible_page_data" class="collapsed in">
-                    <div class="control-group">
-                        <label class="control-label" for="elm_%entity_name%_mainbox_title">{__("mainbox_title")}:</label>
-                        <div class="controls">
-                            <input type="text" id="elm_%entity_name%_mainbox_title" name="%entity_name%_data[mainbox_title]" size="35" value="{$%entity_name%.mainbox_title}" class="input-large" />
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="elm_%entity_name%_description">{__("description")}:</label>
-                        <div class="controls">
-                            <textarea id="elm_%entity_name%_description" name="%entity_name%_data[description]" cols="55" rows="8" class="input-large cm-wysiwyg input-textarea-long">{$%entity_name%.description}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                {include file="common/subheader.tpl" title=__("seo_meta_data") target="#acc_seo"}
-                <div id="acc_seo" class="collapsed in">
-                    <div class="control-group">
-                        <label class="control-label" for="elm_%entity_name%_page_title">{__("page_title")}:</label>
-                        <div class="controls">
-                            <input type="text" name="%entity_name%_data[page_title]" id="elm_%entity_name%_page_title" size="55" value="{$%entity_name%.page_title}" class="input-large" />
-                        </div>
-                    </div>
-
-                    <div class="control-group">
-                        <label class="control-label" for="elm_%entity_name%_meta_description">{__("meta_description")}:</label>
-                        <div class="controls">
-                            <textarea name="%entity_name%_data[meta_description]" id="elm_%entity_name%_meta_description" cols="55" rows="4" class="input-large">{$%entity_name%.meta_description}</textarea>
-                        </div>
-                    </div>
-
-                    <div class="control-group">
-                        <label class="control-label" for="elm_%entity_name%_meta_keywords">{__("meta_keywords")}:</label>
-                        <div class="controls">
-                            <textarea name="%entity_name%_data[meta_keywords]" id="elm_%entity_name%_meta_keywords" cols="55" rows="4" class="input-large">{$%entity_name%.meta_keywords}</textarea>
-                        </div>
-                    </div>
-                </div>
-            {/capture}
-            {include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox}
+            {include file="common/subheader.tpl" title=__("information") target="#acc_info"}
+            <div id="acc_info" class="collapsed in">
+%generator_tpl_field_updates%
+            </div>
         <!--update_%entity_name%_form_{$id}-->
 
         {capture name="buttons"}
@@ -79,7 +30,7 @@
                     {/if}
 
                     {if $allow_save}
-                        <li>{btn type="list" text=__("delete_this_page") class="cm-confirm" href="%entity_name%s.delete?%entity_name%_id=$id" method="POST"}</li>
+                        <li>{btn type="list" text=__("delete") class="cm-confirm" href="%entity_name%s.delete?%entity_name%_id=$id" method="POST"}</li>
                     {/if}
                 {/if}
             {/capture}
