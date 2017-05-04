@@ -112,6 +112,7 @@ class AddonCrudCommand extends Command
             $this->createPart($addon, 'view');
             $this->createPart($addon, 'manifest');
             $this->createPart($addon, 'lang_vars');
+            $this->createPart($addon, 'menu_schema');
         }
     }
 
@@ -141,7 +142,7 @@ class AddonCrudCommand extends Command
             $entity_name . '_descriptions' => $input->getOption('db-table-description')
         );
 
-        $tables = array_filter($tables);
+//        $tables = array_filter($tables);
 
         foreach ($tables as &$table) {
             $table = explode(',', $table);
@@ -152,6 +153,7 @@ class AddonCrudCommand extends Command
                 ), $table);
             }
 
+            $table = array_filter($table);
         } unset($table);
 
         return $tables;
@@ -182,7 +184,7 @@ class AddonCrudCommand extends Command
 
         if ($type == 'model') {
             $paths = array(
-                'Model.php' => $addon->getModelPath($this->args['entity_name'])
+                'Model.php' => $addon->getModelPath($this->convertNotation($this->args['entity_name'], 'underscore', 'camel'))
             );
         } else if ($type == 'lang_vars') {
             $paths = array(
@@ -191,20 +193,25 @@ class AddonCrudCommand extends Command
 
         } else if ($type == 'manifest') {
             $paths = array(
-                'Manifest.xml' => $addon->getAppPath() . 'addon.xml'
+                'Manifest.xml' => $addon->getAppPath() . '/addon.xml'
             );
 
         } else if ($type == 'controller') {
             $paths = array(
-                'Controller.php' => $addon->getControllerPath($this->args['addon_name'])
+                'Controller.php' => $addon->getControllerPath($this->args['entity_name'] . 's')
             );
 
         } else if ($type == 'view') {
             $paths = array(
                 'EntityList.tpl' => $addon->getViewPath("/components/list.tpl"),
                 'SearchForm.tpl' => $addon->getViewPath("/components/search_form.tpl"),
-                'UpdateView.tpl' => $addon->getViewPath("/views/{$this->args['addon_name']}/update.tpl"),
-                'ManageView.tpl' => $addon->getViewPath("/views/{$this->args['addon_name']}/manage.tpl")
+                'UpdateView.tpl' => $addon->getViewPath("/views/{$this->args['entity_name']}s/update.tpl"),
+                'ManageView.tpl' => $addon->getViewPath("/views/{$this->args['entity_name']}s/manage.tpl")
+            );
+
+        } else if ($type == "menu_schema") {
+            $paths = array(
+                'MenuSchema.php' => $addon->getAppPath() . '/schemas/menu/menu.post.php'
             );
         }
 

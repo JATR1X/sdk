@@ -69,7 +69,7 @@ class Addon
     {
         $model_name = !empty($model_name) ? $model_name . '.php' : '';
 
-        return "{$this->getAppPath()}/Models/Tygh/{$model_name}";
+        return "{$this->getAppPath()}/Tygh/Models/{$model_name}";
     }
 
     public function getLangVarsPath($lang)

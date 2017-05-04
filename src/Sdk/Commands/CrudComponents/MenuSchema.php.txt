@@ -1,0 +1,11 @@
+<?php
+
+$schema['central']['website']['items']['%entity_name%s'] = array(
+    'attrs' => array(
+        'class'=>'is-addon'
+    ),
+    'href' => '%entity_name%s.manage',
+    'position' => 601
+);
+
+return $schema;

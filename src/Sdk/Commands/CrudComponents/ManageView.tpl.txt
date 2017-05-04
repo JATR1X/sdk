@@ -18,10 +18,10 @@
 
         {capture name="buttons"}
             {capture name="tools_list"}
-                <li>{btn type="delete_selected" dispatch="dispatch[%entity_name%.m_delete]" form="%entity_name%_form"}</li>
+                <li>{btn type="delete_selected" dispatch="dispatch[%entity_name%s.m_delete]" form="%entity_name%_form"}</li>
             {/capture}
             {dropdown content=$smarty.capture.tools_list}
-            {include file="common/tools.tpl" tool_href="%entity_name%.add" title=__("add_landing_page") hide_tools=true icon="icon-plus"}
+            {include file="common/tools.tpl" tool_href="%entity_name%s.add" title=__("add_%entity_name%") hide_tools=true icon="icon-plus"}
         {/capture}
     </form>
 {/capture}

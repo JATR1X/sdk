@@ -19,3 +19,15 @@ msgstr "%AddonName%"
 msgctxt "Languages::%addon_name%s"
 msgid "%AddonName%s"
 msgstr "%AddonName%s"
+
+msgctxt "Languages::%entity_name%"
+msgid "%EntityName%"
+msgstr "%EntityName%"
+
+msgctxt "Languages::%entity_name%s"
+msgid "%EntityName%s"
+msgstr "%EntityName%s"
+
+msgctxt "Languages::%entity_name%s_menu_description"
+msgid "Manage %EntityName%s"
+msgstr "Manage %EntityName%s"
