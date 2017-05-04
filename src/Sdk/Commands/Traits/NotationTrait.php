@@ -14,7 +14,7 @@ trait NotationTrait
         return $string;
     }
 
-    private function underscoreToCamel($string, $capitalize_first_char = false)
+    private function underscoreToCamel($string, $capitalize_first_char = true)
     {
         $str = str_replace('_', '', ucwords($string, '_'));
 
